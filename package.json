@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "dotenv": "^16.4.5",
+    "@apollo/server-express": "^4.7.1",
     "@apollo/server": "^4.7.1",
     "@apollo/client": "^3.7.14",
     "@tailwindcss/aspect-ratio": "^0.4.2",
