@@ -8,7 +8,7 @@
     "client:dev": "cd client && npm run dev",
     "server:watch": "cd server && npm run watch",
     "develop": "concurrently \"npm run server:watch\" \"npm run client:dev\"",
-    "render-install": "npm install --prefix server && npm install --prefix client ",
+    "render-install": "npm install --prefix server && npm install --prefix client  ",
     "seed": "npm run seed --prefix server",
     "build": "npm run build --prefix client",
     "render": "npm run render-install && npm run build"

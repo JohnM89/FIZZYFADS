@@ -60,6 +60,7 @@ const typeDefs = `
     me: User
     messages: [Message]
     message(id: ID!): Message
+    userMostRecentAppointment(userId: ID!): Appointment
   }
 
   type Message {
@@ -75,7 +76,7 @@ const typeDefs = `
     createMessage (name: String!, email: String!, message: String!): Message
     login(email: String!, password: String!): Auth
     createAppointment(barber_name: BarberEnum!, date: String!, time: String!, service: String!): Appointment
-    deleteAppointment(id: ID!): User
+    deleteAppointment(id: ID!): Appointment
     deleteMessage(id: ID!): Message
     updateAppointment(input: UpdateAppointmentInput!): Appointment
     updateUser(id:ID!, user_name: String!, email: String!, phone: String!, password: String!): User
