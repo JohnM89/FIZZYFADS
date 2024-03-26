@@ -20,7 +20,7 @@ function LandingPage() {
 
   if (!userProfile) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-screen"style={{ marginTop: '-80px' }}>
         <img src={leftImage} alt="Left Decorative" className="w-66 mr-12" />
 
         <div className="flex flex-col items-center text-white">
