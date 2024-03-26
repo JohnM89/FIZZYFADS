@@ -10,7 +10,8 @@
         "seed": "npm run seed --prefix server",
         "build": "npm run build --prefix client",
         "render": "npm run render-install && npm run build"
-        }
+        },
+        
     "author": "",
     "license": "ISC",
     "devDependencies": {
