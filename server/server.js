@@ -4,7 +4,6 @@ const { expressMiddleware } = require('@apollo/server/express4');
 const path = require('path');
 const { authMiddleware } = require('./utils/Auth');
 require('dotenv').config();
-const mongoose = require('mongoose');
 
 const { typeDefs, resolvers } = require('./schemas');
 const db = require('./config/connection');
@@ -16,6 +15,17 @@ const server = new ApolloServer({
   resolvers,
 });
 
+const mongoose = require('mongoose');
+
+// MongoDB connection string with password from environment variable
+const uri = process.env.MONGODB_URI;
+
+// Connect to MongoDB Atlas
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB Atlas'))
+  .catch(err => console.error('Error connecting to MongoDB Atlas', err));
+
+// Create a new instance of an Apollo server with the GraphQL schema
 const startApolloServer = async () => {
   await server.start();
 
@@ -34,13 +44,10 @@ const startApolloServer = async () => {
     });
   }
 
-  // Serve static files in development mode
-  if (process.env.NODE_ENV !== 'production') {
-    app.use(express.static(path.join(__dirname, '../client/dist')));
-    app.get('/', (req, res) => {
-      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
-    });
-  }
+  app.use(express.static(path.join(__dirname, '../client/dist')));
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  });
 
   db.once('open', () => {
     app.listen(PORT, () => {
@@ -51,4 +58,4 @@ const startApolloServer = async () => {
 };
 
 // Call the async function to start the server
-startApolloServer();
+  startApolloServer();
