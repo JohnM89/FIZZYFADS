@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useAuth } from '../src/utils/authContext';
 import AppointmentsList from '../src/Components/AppointmentsList';
 // import AppointmentsListUser from './Components/AppointmentsListUser';  -- comment back in for user dashboard
-import fitzysExterior from "./assets/images/fitzys_fades_exterior.jpg";
+// import fitzysExterior from "./assets/images/fitzys_fades_exterior.jpg";
 import leftImage from '/images/121.gif';
 import rightImage from '/images/121.gif';
 
@@ -47,7 +47,8 @@ function LandingPage() {
         <section className="flex flex-col items-center justify-center">
           <p className="text-center text-white pt-20" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>Greetings  {userProfile ? userProfile.user_name : 'Customer'} -- You're now logged in!</p>
           <section className="locationimg-card max-w-md pt-10">
-            <img className="location-image" src={fitzysExterior} alt="Fitzys Exterior" />
+           <img className="location-image" src="/images/BarberBugs.gif" alt="Fitzys Exterior" />
+
           </section>
           {/* <AppointmentsListUser /> -- comment back in for user dashboard */}
           {/* placeholder for user stuff, possibly a user dashboard to display appointment */}
