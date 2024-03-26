@@ -14,7 +14,6 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
 });
-
 const mongoose = require('mongoose');
 
 // MongoDB connection string with password from environment variable
