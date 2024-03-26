@@ -3,10 +3,7 @@
 // import React from 'react';
 import '../styles/Header.css';
 import headerImage from '/images/textstripe.jpg';
-
 import { useAuth } from '../utils/authContext';
-
-import {Link} from 'react-router-dom';
 
 function Header() {
   //const [count, setCount] = useState(0)
@@ -25,16 +22,16 @@ function Header() {
         </div>
         <nav className="flex items-center">
           <ul className="flex space-x-4 text-white">
-            <li><Link className="hover:text-gray-300" to="/">Home</Link></li>
-            <li><Link className="hover:text-gray-300" to="/Linkbout">About us</Link></li>
-            <li><Link className="hover:text-gray-300" to="/services">Services</Link></li>
-            <li><Link className="hover:text-gray-300" to="/contact">Contact</Link></li>
+            <li><a className="hover:text-gray-300" href="/">Home</a></li>
+            <li><a className="hover:text-gray-300" href="/about">About us</a></li>
+            <li><a className="hover:text-gray-300" href="/services">Services</a></li>
+            <li><a className="hover:text-gray-300" href="/contact">Contact</a></li>
             {isLoggedIn ? (
               <li><button className="hover:text-gray-300" onClick={logout}>Sign Out</button></li>
             ) : (
               <>
-                <li><Link className="hover:text-gray-300" to="/signup">Sign Up</Link></li>
-                <li><Link className="hover:text-gray-300" to="/signin">Sign In</Link></li>
+                <li><a className="hover:text-gray-300" href="/signup">Sign Up</a></li>
+                <li><a className="hover:text-gray-300" href="/signin">Sign In</a></li>
               </>
             )}
           </ul>
