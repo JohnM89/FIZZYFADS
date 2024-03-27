@@ -24,9 +24,10 @@ const AppointmentsListUser = () => {
   }, []);
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
-  if (!data || !data.userMostRecentAppointment) {
-    return <p>No appointment yet bud.</p>;
+if (error || !data || !data.userMostRecentAppointment) {
+    console.log(error)
+    return <p className="text-1xl mb-4 text-center text-white" style={{ textShadow: '4px 4px 4px rgba(0, 0, 0, 0.8)' }}>No appointment yet doc.</p>;
+
   }
 
   const appointment = data.userMostRecentAppointment;
@@ -41,6 +42,7 @@ const AppointmentsListUser = () => {
         <p>Service: {appointment.service}</p>
         <p>Date: {appointment.date}</p>
         <p>Time: {appointment.time}</p>
+        
         <div className="absolute right-0 top-1/2 transform -translate-y-1/2 -translate-x-1 scale-50 ml-24">
           <stripe-buy-button
             buy-button-id="buy_btn_1OyjwXG8J5fghEqMWiSaoNs0"
