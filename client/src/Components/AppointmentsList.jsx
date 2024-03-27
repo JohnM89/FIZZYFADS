@@ -10,7 +10,7 @@ const AppointmentsList = () => {
 
     const [deleteAppointment, { loading: deleting, error: deleteError }] = useMutation(DELETE_APPOINTMENT, {
         refetchQueries: [
-            { query: GET_ALL_APPOINTMENTS }, // Refetch appointments after deletion
+            { query: GET_ALL_APPOINTMENTS },
         ],
     });
     const [updateAppointment, { loading: updating, error: updateError }] = useMutation(UPDATE_APPOINTMENT, {
@@ -24,16 +24,15 @@ const AppointmentsList = () => {
             await deleteAppointment({
                 variables: { id },
             });
-            // Optionally, show a success message or perform additional actions
+
         } catch (error) {
             console.error("Error deleting appointment:", error);
-            // Optionally, handle errors, e.g., by showing an error message
+
         }
     };
 
     const handleUpdate = async (id) => {
         try {
-            // Implement the logic to update the appointment data
             const appointmentToUpdate = sortedAppointments.find(appointment => appointment._id === id);
             setCurrentAppointment(appointmentToUpdate);
             // insert modal here
@@ -45,7 +44,7 @@ const AppointmentsList = () => {
                 service: '',
             };
 
-            // Call the updateAppointment mutation with the updated appointment data
+
             await updateAppointment({
                 variables: {
                     id: appointmentToUpdate._id,
@@ -56,28 +55,27 @@ const AppointmentsList = () => {
                 },
             });
 
-            // Optionally, show a success message or perform additional actions after updating
+
 
         } catch (error) {
             console.error("Error updating appointment:", error);
-            // Optionally, handle errors, e.g., by showing an error message
+
         }
     };
 
-    const submitUpdatedAppointment = async (e) => {
-    e.preventDefault();
-    await updateAppointment({
-        variables: {
-            id: currentAppointment._id,
-            barberName: currentAppointment.barberName,
-            date: currentAppointment.date,
-            time: currentAppointment.time,
-            service: currentAppointment.service,
-        },
-    });
-    setCurrentAppointment(null); // Close the modal or form
-    // Optionally, handle UI feedback such as a success message
-};
+    const submitUpdatedAppointment = async (e) => { // not working yet and most likely needs to be refactored
+        e.preventDefault();
+        await updateAppointment({
+            variables: {
+                id: currentAppointment._id,
+                barberName: currentAppointment.barberName,
+                date: currentAppointment.date,
+                time: currentAppointment.time,
+                service: currentAppointment.service,
+            },
+        });
+        setCurrentAppointment(null);
+    };
 
 
 

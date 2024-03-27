@@ -5,7 +5,7 @@ import { useAuth } from '../utils/authContext';
 
 const AppointmentsListUser = () => {
   const { userProfile } = useAuth();
-  const stripeBtnRef = useRef(null); // Create a ref for the Stripe button
+  // const stripeBtnRef = useRef(null); // ref for the Stripe Buy Button NOT USED
 
   const { loading, error, data } = useQuery(GET_USER_MOST_RECENT_APPOINTMENT, {
     variables: { userId: userProfile._id }
@@ -41,7 +41,6 @@ const AppointmentsListUser = () => {
         <p>Service: {appointment.service}</p>
         <p>Date: {appointment.date}</p>
         <p>Time: {appointment.time}</p>
-        {/* Adjusting for center-right positioning */}
         <div className="absolute right-0 top-1/2 transform -translate-y-1/2 -translate-x-1 scale-50 ml-24">
           <stripe-buy-button
             buy-button-id="buy_btn_1OyjwXG8J5fghEqMWiSaoNs0"
