@@ -6,6 +6,7 @@ import { DELETE_APPOINTMENT, UPDATE_APPOINTMENT } from '../utils/mutations';
 const AppointmentsList = () => {
     const { loading, error, data } = useQuery(GET_ALL_APPOINTMENTS);
     const [orderBy, setOrderBy] = useState('date');
+    const [currentAppointment, setCurrentAppointment] = useState(null);
 
     const [deleteAppointment, { loading: deleting, error: deleteError }] = useMutation(DELETE_APPOINTMENT, {
         refetchQueries: [
@@ -34,6 +35,8 @@ const AppointmentsList = () => {
         try {
             // Implement the logic to update the appointment data
             const appointmentToUpdate = sortedAppointments.find(appointment => appointment._id === id);
+            setCurrentAppointment(appointmentToUpdate);
+            // insert modal here
 
             const updatedAppointmentData = {
                 barberName: '',
@@ -60,6 +63,21 @@ const AppointmentsList = () => {
             // Optionally, handle errors, e.g., by showing an error message
         }
     };
+
+    const submitUpdatedAppointment = async (e) => {
+    e.preventDefault();
+    await updateAppointment({
+        variables: {
+            id: currentAppointment._id,
+            barberName: currentAppointment.barberName,
+            date: currentAppointment.date,
+            time: currentAppointment.time,
+            service: currentAppointment.service,
+        },
+    });
+    setCurrentAppointment(null); // Close the modal or form
+    // Optionally, handle UI feedback such as a success message
+};
 
 
 

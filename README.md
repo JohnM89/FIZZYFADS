@@ -29,7 +29,7 @@ View list of appointments made by clients.
 
 ## Live Site
 
-[Check out the website here.](still need the url here.)
+[Check out the website here.](https://fizzyfads.onrender.com/)
 
 ## Usage
 

@@ -13,6 +13,7 @@ function Services() {
   const [dateTimePanel, switchDateTimePanel] = useState("BARBER");
   const [serviceSelected, setService] = useState("");
   const navigate = useNavigate();
+  
 
   const [createAppointment] = useMutation(CREATE_APPOINTMENT);
 

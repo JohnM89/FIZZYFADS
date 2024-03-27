@@ -14,7 +14,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
 });
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 // comment out to run locally 
 // MongoDB connection string with password from environment variable -- comment out to run locally 
 const uri = process.env.MONGODB_URI;
