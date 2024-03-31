@@ -2,83 +2,65 @@ import { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_ALL_APPOINTMENTS } from '../utils/queries';
 import { DELETE_APPOINTMENT, UPDATE_APPOINTMENT } from '../utils/mutations';
+import ModifyAppointmentForm from './ModifyAppointmentForm';
 
 const AppointmentsList = () => {
     const { loading, error, data } = useQuery(GET_ALL_APPOINTMENTS);
     const [orderBy, setOrderBy] = useState('date');
-    const [currentAppointment, setCurrentAppointment] = useState(null);
-
+    const [modifiedAppointments, setModifiedAppointments] = useState({});
     const [deleteAppointment, { loading: deleting, error: deleteError }] = useMutation(DELETE_APPOINTMENT, {
-        refetchQueries: [
-            { query: GET_ALL_APPOINTMENTS },
-        ],
+        refetchQueries: [{ query: GET_ALL_APPOINTMENTS }],
     });
-    const [updateAppointment, { loading: updating, error: updateError }] = useMutation(UPDATE_APPOINTMENT, {
-        refetchQueries: [
-            { query: GET_ALL_APPOINTMENTS },
-        ],
+    const [updateAppointment] = useMutation(UPDATE_APPOINTMENT, {
+        refetchQueries: [{ query: GET_ALL_APPOINTMENTS }],
     });
+
+    const handleModify = (id, barber_name, date, time, service, user) => {
+        setModifiedAppointments(prevState => ({
+            ...prevState,
+            [id]: { id, barber_name, date, time, service, user }
+        }));
+    };
 
     const handleDelete = async (id) => {
         try {
-            await deleteAppointment({
-                variables: { id },
-            });
-
+            await deleteAppointment({ variables: { id } });
         } catch (error) {
             console.error("Error deleting appointment:", error);
-
         }
     };
 
-    const handleUpdate = async (id) => {
-        try {
-            const appointmentToUpdate = sortedAppointments.find(appointment => appointment._id === id);
-            setCurrentAppointment(appointmentToUpdate);
-            // insert modal here
-
-            const updatedAppointmentData = {
-                barberName: '',
-                date: '',
-                time: '',
-                service: '',
-            };
-
-
-            await updateAppointment({
-                variables: {
-                    id: appointmentToUpdate._id,
-                    barberName: updatedAppointmentData.barberName,
-                    date: updatedAppointmentData.date,
-                    time: updatedAppointmentData.time,
-                    service: updatedAppointmentData.service,
-                },
-            });
-
-
-
-        } catch (error) {
-            console.error("Error updating appointment:", error);
-
-        }
-    };
-
-    const submitUpdatedAppointment = async (e) => { // not working yet and most likely needs to be refactored
-        e.preventDefault();
+const handleSubmit = async ({ appointmentId, barberName, date, time, service }) => {
+    try {
         await updateAppointment({
             variables: {
-                id: currentAppointment._id,
-                barberName: currentAppointment.barberName,
-                date: currentAppointment.date,
-                time: currentAppointment.time,
-                service: currentAppointment.service,
+                id: appointmentId, 
+                input: {
+                    barber_name: barberName, 
+                    date,
+                    time,
+                    service,
+                },
             },
         });
-        setCurrentAppointment(null);
-    };
+        console.log('Appointment updated successfully');
+    } catch (error) {
+        console.error('Error updating appointment:', error);
+
+    }
+};
 
 
-
+const handleCancel = (id) => {
+    setModifiedAppointments(prevState => {
+        // Create a copy of the state to manipulate
+        const newState = { ...prevState };
+        // Remove the entry for the given id
+        delete newState[id];
+        // Return the new state without the entry
+        return newState;
+    });
+};
 
     const handleOrderByChange = (event) => {
         setOrderBy(event.target.value);
@@ -94,15 +76,12 @@ const AppointmentsList = () => {
         switch (orderBy) {
             case 'date':
                 return new Date(a.date) - new Date(b.date);
-            // case 'username':
-            //     return a.user.user_name.localeCompare(b.user.user_name); //uncomment this after clearing GraphQL otherwise it will throw errors
             case 'barber':
                 return a.barber_name.localeCompare(b.barber_name);
             default:
                 return 0;
         }
-    }
-    );
+    });
 
     return (
         <div className="container custom-scrollbar md:max-h-[408px] px-16 h-screen overflow-y-auto mx-auto">
@@ -111,7 +90,6 @@ const AppointmentsList = () => {
                 <label htmlFor="orderBy" className="block text-sm font-medium text-white 500" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>Order By:</label>
                 <select id="orderBy" name="orderBy" className="mt-1 block w-full p-2 border border-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" onChange={handleOrderByChange}>
                     <option value="date">Date</option>
-                    {/* <option value="username">Customer Name</option> */} {/*uncomment this after clearing GraphQL otherwise it will throw errors*/}
                     <option value="barber">Barber</option>
                 </select>
             </div>
@@ -127,18 +105,26 @@ const AppointmentsList = () => {
                             <div className="mt-4 border-t pt-2">
                                 <h3 className="text-center font-semibold">Customer: {user.user_name}</h3>
                                 <p className=" font-semibold ml-12">Email: {user.email}</p>
-                                {/* <p className=" ml-12">Phone: {user.phone}</p> */}
                             </div>
                         )}
                     </div>
                     <div className="ml-auto">
-                        <button
-                            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-900 transition duration-300 mr-24"
-                            onClick={() => handleUpdate(_id)}
-                            disabled={updating}
-                        >
-                            Modify
-                        </button>
+                        <div>
+                            <button
+                                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-900 transition duration-300 mr-24"
+                                onClick={() => handleModify(_id, barber_name, date, time, service, user)}
+                            >
+                                Modify
+                            </button>
+                            {modifiedAppointments[_id] && (
+                            <ModifyAppointmentForm
+                                modifiedAppointment={modifiedAppointments[_id]}
+                                handleSubmit={handleSubmit}
+                                handleCancel={handleCancel}
+                                appointmentId={_id} 
+                            />
+                            )}
+                        </div>
                         <button
                             className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-900 transition duration-300 mr-24"
                             onClick={() => handleDelete(_id)}
@@ -149,7 +135,6 @@ const AppointmentsList = () => {
                     </div>
                 </div>
             ))}
-
             {deleteError && <p>Error deleting appointment. Please try again.</p>}
         </div>
     );

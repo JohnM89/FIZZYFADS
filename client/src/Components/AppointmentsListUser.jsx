@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_USER_MOST_RECENT_APPOINTMENT } from '../utils/queries';
 import { useAuth } from '../utils/authContext';
@@ -31,6 +31,7 @@ const AppointmentsListUser = () => {
   }
 
   const appointment = data.userMostRecentAppointment;
+  
 
   return (
     <div className="container md:max-h-[408px] px-16 h-screen overflow-y-auto mx-auto relative">

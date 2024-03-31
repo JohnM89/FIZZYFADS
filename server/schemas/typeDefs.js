@@ -31,14 +31,12 @@ const typeDefs = `
     user: User
   }
 
-  input UpdateAppointmentInput {
-    userId: ID!
-    appointmentId: ID!
-    barber_name: BarberEnum!
-    date: String!
-    time: String!
-    service: String!
-  }
+input UpdateAppointmentInput {
+  barber_name: String!
+  date: String!
+  time: String!
+  service: String!
+}
 
   input UserInput {
     user_name: String!
@@ -78,7 +76,7 @@ const typeDefs = `
     createAppointment(barber_name: BarberEnum!, date: String!, time: String!, service: String!): Appointment
     deleteAppointment(id: ID!): Appointment
     deleteMessage(id: ID!): Message
-    updateAppointment(input: UpdateAppointmentInput!): Appointment
+    updateAppointment(id: ID!, barber_name: BarberEnum, date: String, time: String, service: String): Appointment
     updateUser(id:ID!, user_name: String!, email: String!, phone: String!, password: String!): User
   }
 `;

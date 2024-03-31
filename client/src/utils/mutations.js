@@ -84,18 +84,20 @@ export const DELETE_MESSAGE = gql`
     }
   }
 `;
-
+// had the wrong input variable (needed $id) and needed BarberEnum not a string
 export const UPDATE_APPOINTMENT = gql`
-  mutation UpdateAppointment($id: ID!, $barberName: String!, $date: String!, $time: String!, $service: String!) {
-    updateAppointment(id: $id, barber_name: $barberName, date: $date, time: $time, service: $service) {
-      _id
-      barber_name
-      date
-      time
-      service
-    }
+mutation UpdateAppointment($id: ID!, $input: UpdateAppointmentInput!) {
+  updateAppointment(id: $id, input: $input) {
+    _id
+    barber_name
+    date
+    time
+    service
   }
+}
 `;
+
+
 
 export const UPDATE_USER = gql`
   mutation UpdateUser($id: ID!, $user_name: String!, $email: String!, $phone: String!, $password: String) {

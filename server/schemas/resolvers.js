@@ -258,25 +258,26 @@ const resolvers = {
     },
 
     //update the signed in user's appointment detail
-    updateAppointment: async (_, { id, barber_name, date, time, service }, context) => {
-      if (!context.user) {
-        throw new Error("You need to be logged in to update this appointment!");
-      }
-      const user = await User.findById(context.user._id);
-      if (!user) {
-        throw new Error("User not found");
-      }
-      const appointment = user.appointments.id(id);
-      if (!appointment) {
-        throw new Error("Appointment not found");
-      }
-      appointment.barber_name = barber_name;
-      appointment.date = date;
-      appointment.time = time;
-      appointment.service = service;
-      await user.save();
-      return appointment;
-    },
+updateAppointment: async (_, { id, barber_name, date, time, service }, context) => {
+  if (!context.user) {
+    throw new Error("You need to be logged in to update this appointment!");
+  }
+  const user = await User.findById(context.user._id);
+  if (!user) {
+    throw new Error("User not found");
+  }
+  const appointment = user.appointments.id(id);
+  if (!appointment) {
+    throw new Error("Appointment not found");
+  }
+  // Update the appointment fields
+  appointment.barber_name = barber_name;
+  appointment.date = date;
+  appointment.time = time;
+  appointment.service = service; // Treated as a string, no enum concerns
+  await user.save();
+  return appointment;
+},
   },
 };
 
