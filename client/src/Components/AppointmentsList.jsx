@@ -15,10 +15,10 @@ const AppointmentsList = () => {
         refetchQueries: [{ query: GET_ALL_APPOINTMENTS }],
     });
 
-    const handleModify = (_id, barber_name, date, time, service) => {
+    const handleModify = (id, barber_name, date, time, service, user) => {
         setModifiedAppointments(prevState => ({
             ...prevState,
-            [_id]: { _id, barber_name, date, time, service } // Use _id directly for clarity
+            [id]: { id, barber_name, date, time, service, user }
         }));
     };
 
@@ -30,27 +30,37 @@ const AppointmentsList = () => {
         }
     };
 
-const handleSubmit = async ({ _id, barberName, date, time, service }) => {
+const handleSubmit = async ({ appointmentId, barberName, date, time, service }) => {
     try {
         await updateAppointment({
             variables: {
-                id: _id, 
-                input: { barber_name: barberName, date, time, service },
+                id: appointmentId, 
+                input: {
+                    barber_name: barberName, 
+                    date,
+                    time,
+                    service,
+                },
             },
         });
         console.log('Appointment updated successfully');
     } catch (error) {
-        console.error('Error updating appointment:', error); // ahh what the hell am i missing here backend is returning a 400 error but i don't know why! everything looks lined up with the schema and resolver and typeDefs probably some variable name is off
+        console.error('Error updating appointment:', error);
+
     }
 };
 
-    const handleCancel = (id) => {
-        setModifiedAppointments(prevState => {
-            const newState = { ...prevState };
-            delete newState[id];
-            return newState;
-        });
-    };
+
+const handleCancel = (id) => {
+    setModifiedAppointments(prevState => {
+        // Create a copy of the state to manipulate
+        const newState = { ...prevState };
+        // Remove the entry for the given id
+        delete newState[id];
+        // Return the new state without the entry
+        return newState;
+    });
+};
 
     const handleOrderByChange = (event) => {
         setOrderBy(event.target.value);
@@ -102,17 +112,17 @@ const handleSubmit = async ({ _id, barberName, date, time, service }) => {
                         <div>
                             <button
                                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-900 transition duration-300 mr-24"
-                                onClick={() => handleModify(_id, barber_name, date, time, service)}
+                                onClick={() => handleModify(_id, barber_name, date, time, service, user)}
                             >
                                 Modify
                             </button>
                             {modifiedAppointments[_id] && (
-                                <ModifyAppointmentForm
-                                    modifiedAppointment={modifiedAppointments[_id]}
-                                    handleSubmit={handleSubmit}
-                                    handleCancel={handleCancel}
-                                    appointmentId={_id}
-                                />
+                            <ModifyAppointmentForm
+                                modifiedAppointment={modifiedAppointments[_id]}
+                                handleSubmit={handleSubmit}
+                                handleCancel={handleCancel}
+                                appointmentId={_id} 
+                            />
                             )}
                         </div>
                         <button
