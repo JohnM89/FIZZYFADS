@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { UPDATE_APPOINTMENT } from '../utils/mutations';
 
-const ModifyAppointmentForm = ({ modifiedAppointment, onClose }) => {
+const ModifyAppointmentForm = ({ modifiedAppointment, onClose, refetch }) => {
     const [updateAppointment] = useMutation(UPDATE_APPOINTMENT);
     const [barberName, setBarberName] = useState(modifiedAppointment.barber_name);
     const [date, setDate] = useState(new Date(modifiedAppointment.date));
@@ -17,23 +17,25 @@ const ModifyAppointmentForm = ({ modifiedAppointment, onClose }) => {
         setStep(step + 1);
     };
 
-const handleSubmit = async () => {
-    try {
-        await updateAppointment({
-            variables: {
-                id: modifiedAppointment.id,
-                barberName,
-                date,
-                time,
-                service,
-            },
-        });
-        console.log('Appointment updated successfully');
-        onClose(); 
-    } catch (error) {
-        console.error('Error updating appointment:', error.message);
-    }
-};
+    const handleSubmit = async () => {
+        try {
+            await updateAppointment({
+                variables: {
+                    id: modifiedAppointment._id,
+                    barberName,
+                    date,
+                    time,
+                    service,
+                },
+            });
+            console.log('Appointment updated successfully');
+            onClose();
+            await refetch();
+
+        } catch (error) {
+            console.error('Error updating appointment:', error.message);
+        }
+    };
 
 
     console.log("Rendering ModifyAppointmentForm");
@@ -100,6 +102,7 @@ const handleSubmit = async () => {
 ModifyAppointmentForm.propTypes = {
     modifiedAppointment: PropTypes.object.isRequired,
     onClose: PropTypes.func.isRequired,
+    refetch: PropTypes.func.isRequired,
 };
 
 export default ModifyAppointmentForm;

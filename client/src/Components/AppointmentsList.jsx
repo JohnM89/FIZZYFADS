@@ -6,18 +6,16 @@ import ModifyAppointmentForm from './ModifyAppointmentForm';
 
 const AppointmentsList = () => {
     const { loading, error, data } = useQuery(GET_ALL_APPOINTMENTS);
+    const { refetch } = useQuery(GET_ALL_APPOINTMENTS);
     const [orderBy, setOrderBy] = useState('date');
-    // const [modifiedAppointments, setModifiedAppointments] = useState({});
-     const [selectedAppointmentId, setSelectedAppointmentId] = useState(null); 
+    const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
     const [deleteAppointment, { loading: deleting, error: deleteError }] = useMutation(DELETE_APPOINTMENT, {
         refetchQueries: [{ query: GET_ALL_APPOINTMENTS }],
     });
-    // const [updateAppointment] = useMutation(UPDATE_APPOINTMENT, {
-    //     refetchQueries: [{ query: GET_ALL_APPOINTMENTS }],
-    // });
 
-    const handleModify = (id) => {
-        setSelectedAppointmentId(id);
+
+    const handleModify = (appointment) => {
+        setSelectedAppointmentId(appointment._id);
     };
 
 
@@ -30,7 +28,7 @@ const AppointmentsList = () => {
     };
 
     const closeForm = () => {
-        setSelectedAppointmentId(null); 
+        setSelectedAppointmentId(null);
     };
 
 
@@ -86,15 +84,15 @@ const AppointmentsList = () => {
                         <div>
                             <button
                                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-900 transition duration-300 mr-24"
-                                onClick={() => handleModify(_id, barber_name, date, time, service, user)}
+                                onClick={() => handleModify({ _id, barber_name, date, time, service, user })}
                             >
                                 Modify
                             </button>
                             {selectedAppointmentId && (
-                            <ModifyAppointmentForm
-                                modifiedAppointment={sortedAppointments.find(appointment => appointment._id === selectedAppointmentId)}
-                    onClose={closeForm}
-                            />
+                                <ModifyAppointmentForm refetch={refetch}
+                                    modifiedAppointment={sortedAppointments.find(appointment => appointment._id === selectedAppointmentId)}
+                                    onClose={closeForm}
+                                />
                             )}
                         </div>
                         <button

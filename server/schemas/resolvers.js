@@ -257,47 +257,40 @@ const resolvers = {
       return { messages: remainingMessages };
     },
 
-    //update the signed in user's appointment detail
-    updateAppointment: async (_, { id, barber_name, date, time, service }, context) => {
-      // Check if the user is logged in
-      if (!context.user) {
+    //update the signed in user's appointment detail, holy #%&^ i got it to work, ofc users and appointments are differently stored in the database
+updateAppointment: async (_, { id, barber_name, date, time, service }, context) => {
+    
+    if (!context.user) {
         throw new Error("You need to be logged in to update this appointment!");
-      }
+    }
 
-      // Find the user based on the context's user ID
-      const user = await User.findById(context.user._id);
-      if (!user) {
-        throw new Error("User not found");
-      }
-
-      // Add an admin check here
-      if (user.role !== 'admin') {
+    
+    if (context.user.role !== 'admin') {
         throw new Error("You must be an admin to update appointments.");
-      }
+    }
 
-      // Assuming appointments are directly related to the user model,
-      // this finds the specific appointment to update
-      const appointment = user.appointments.id(id);
-      if (!appointment) {
-        throw new Error("Appointment not found");
-      }
+    try {
+        
+        const appointment = await Appointment.findById(id);
+        if (!appointment) {
+            throw new Error("Appointment not found");
+        }
 
-      // Check if the provided barber_name matches one of the BarberEnum values
-      if (!Object.values(BarberEnum).includes(barber_name)) {
-        throw new Error("Invalid barber name");
-      }
+        
+        appointment.barber_name = barber_name;
+        appointment.date = date;
+        appointment.time = time;
+        appointment.service = service;
 
-      // Update the appointment details
-      appointment.barber_name = barber_name;
-      appointment.date = date;
-      appointment.time = time;
-      appointment.service = service;
-      await user.save();
-
-      return appointment;
-    },
-
+       
+        const updatedAppointment = await appointment.save();
+        return updatedAppointment;
+    } catch (error) {
+        console.error("Error updating appointment:", error);
+        throw new Error("Failed to update appointment");
+    }
+},
   },
-};
+}; 
 
 module.exports = resolvers;
