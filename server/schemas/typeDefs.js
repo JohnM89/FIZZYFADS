@@ -32,7 +32,7 @@ const typeDefs = `
   }
 
 input UpdateAppointmentInput {
-  barber_name: String!
+  barber_name: BarberEnum!
   date: String!
   time: String!
   service: String!

@@ -18,10 +18,10 @@ const submitAndClose = () => {
     console.log("Submitting and closing...");
     handleSubmit({
         appointmentId: modifiedAppointment.id,
-        barberName: barberName,
-        date: date,
-        time: time,
-        service: service,
+        barberName: barberName, // corrected to match handleSubmit
+        date,
+        time,
+        service,
     });
     handleCancel();
 };

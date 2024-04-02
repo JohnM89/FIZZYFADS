@@ -86,8 +86,8 @@ export const DELETE_MESSAGE = gql`
 `;
 // had the wrong input variable (needed $id) and needed BarberEnum not a string
 export const UPDATE_APPOINTMENT = gql`
-mutation UpdateAppointment($id: ID!, $input: UpdateAppointmentInput!) {
-  updateAppointment(id: $id, input: $input) {
+mutation UpdateAppointment($id: ID!, $barberName: BarberEnum!, $date: String!, $time: String!, $service: String!) {
+  updateAppointment(id: $id, barberName: $barberName, date: $date, time: $time, service: $service) {
     _id
     barber_name
     date

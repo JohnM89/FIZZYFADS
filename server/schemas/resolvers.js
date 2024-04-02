@@ -14,13 +14,13 @@ const resolvers = {
       return await User.findById(id).populate("appointments");
     },
 
-        //alternative approach I was considering for get all with an if statement (not args) to check if the user is an admin and if not then get all appointments for the user   -- comment back in for user dashboard operation
+    //alternative approach I was considering for get all with an if statement (not args) to check if the user is an admin and if not then get all appointments for the user   -- comment back in for user dashboard operation
     // appointments: async (_, args, context) => {
     // // to ensure the user is logged in
     // if (!context.user) {
     //   throw new Error('You must be logged in.');
     // }
-    
+
     // //if the user is an admin, return all appointments
     // if (context.user.role === 'admin') {
     //   return await Appointment.find({}).populate("user");
@@ -38,38 +38,38 @@ const resolvers = {
       }
       // not sure if i need to include arguments in the function to get all appointments
 
-      
+
       return await Appointment.find({}).populate("user"); // <--- for returning all appointments
     },
 
-    
+
 
     // get most recent appointment for a user
-  userMostRecentAppointment: async (_, { userId }, context) => {
-    try {
-      if (!context.user || context.user.role === 'admin') {
-        throw new Error('Please log in as admin.');
+    userMostRecentAppointment: async (_, { userId }, context) => {
+      try {
+        if (!context.user || context.user.role === 'admin') {
+          throw new Error('Please log in as admin.');
+        }
+        const user = await User.findById(context.user._id).populate('appointments');
+        if (!user) {
+          throw new Error("User not found");
+        }
+
+        // sort by date
+        const sortedAppointments = user.appointments.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // find the first appointment with a non-null barber_name, this fixed the damn thing barber kept returning null
+        const mostRecentAppointment = sortedAppointments.find(appointment => appointment.barber_name !== null);
+
+        if (!mostRecentAppointment) {
+          throw new Error("No recent appointment found");
+        }
+
+        return mostRecentAppointment;
+      } catch (error) {
+        throw new Error("Error fetching user's most recent appointment: " + error.message);
       }
-      const user = await User.findById(context.user._id).populate('appointments');
-      if (!user) {
-        throw new Error("User not found");
-      }
-
-      // sort by date
-      const sortedAppointments = user.appointments.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-      // find the first appointment with a non-null barber_name, this fixed the damn thing barber kept returning null
-      const mostRecentAppointment = sortedAppointments.find(appointment => appointment.barber_name !== null);
-
-      if (!mostRecentAppointment) {
-        throw new Error("No recent appointment found");
-      }
-
-      return mostRecentAppointment;
-    } catch (error) {
-      throw new Error("Error fetching user's most recent appointment: " + error.message);
-    }
-  },
+    },
 
 
 
@@ -88,8 +88,8 @@ const resolvers = {
     },
     // Get a single message by ID
     message: async (_, { id }, context) => {
-      //I think I will need John M's help with implementing barber authentication check here. Currently placeholder)
-      if (!context.user.isBarber) {
+      //I think I will need John M's help with implementing barber authentication check here. Currently placeholder) -- I added the context.user.role === 'admin' check
+      if (!context.user || context.user.role === 'admin') {
 
         throw new AuthenticationError("You don't not have permission to view this message")
 
@@ -119,24 +119,24 @@ const resolvers = {
     // },
   },
   Mutation: {
-   createUser: async (_, { userInput }) => {
+    createUser: async (_, { userInput }) => {
       const user = await User.create(userInput);
       const token = signToken(user);
       return { token, user };
-  },
+    },
     createAdminUser: async (_, { userInput, adminKey }) => {
-    if (adminKey !== ADMIN_KEY) {
-      throw new Error('Unauthorized: Admin key is invalid.');
-    }
-    const user = await User.create({ ...userInput, role: 'admin' });
-    const token = signToken(user);
-    return { token, user };
-  },
+      if (adminKey !== ADMIN_KEY) {
+        throw new Error('Unauthorized: Admin key is invalid.');
+      }
+      const user = await User.create({ ...userInput, role: 'admin' });
+      const token = signToken(user);
+      return { token, user };
+    },
     // Creates a message and adds to the database
     createMessage: async (_, { name, email, message }) => {
 
       const sentMessage = await Message.create({ name, email, message });
-      return  sentMessage ;
+      return sentMessage;
 
     },
     login: async (_, { email, password }) => {
@@ -148,8 +148,8 @@ const resolvers = {
       if (!correctPw) {
         throw new AuthenticationError("Incorrect credentials");
       }
-      const isAdmin = user.role === 'admin'; 
-      
+      const isAdmin = user.role === 'admin';
+
       const token = signToken(user);
 
       return { token, user: { ...user.toObject(), isAdmin } };
@@ -209,39 +209,39 @@ const resolvers = {
     //   return user;
     // },
     deleteAppointment: async (_, { id }, context) => {
-  // Check if the user is logged in
-  if (!context.user) {
-    throw new Error("You must be logged in to delete an appointment");
-  }
+      // Check if the user is logged in
+      if (!context.user) {
+        throw new Error("You must be logged in to delete an appointment");
+      }
 
-  // Check if the user is an admin
-  if (context.user.role !== 'admin') {
-    throw new Error("You are not authorized to delete this appointment");
-  }
+      // Check if the user is an admin
+      if (context.user.role !== 'admin') {
+        throw new Error("You are not authorized to delete this appointment");
+      }
 
-  try {
-    // Attempt to find the appointment before deletion to ensure it can be returned after deletion
-    const appointment = await Appointment.findById(id);
-    if (!appointment) {
-      throw new Error("Appointment not found");
-    }
+      try {
+        // Attempt to find the appointment before deletion to ensure it can be returned after deletion
+        const appointment = await Appointment.findById(id);
+        if (!appointment) {
+          throw new Error("Appointment not found");
+        }
 
-    // Perform the deletion
-    await Appointment.findByIdAndDelete(id);
+        // Perform the deletion
+        await Appointment.findByIdAndDelete(id);
 
-    // Since the function now should return the deleted Appointment, we return the appointment
-    // that we fetched before deletion.
-    return appointment;
+        // Since the function now should return the deleted Appointment, we return the appointment
+        // that we fetched before deletion.
+        return appointment;
 
-    // Note: Since only admins can delete appointments, and we're returning the deleted appointment,
-    // there's no need to update the User document to pull the deleted appointment reference.
-    // This logic can be omitted or adjusted based on specific requirements of how you're tracking appointments.
-  } catch (error) {
-    // Log the error or handle it as needed
-    console.error("Error deleting appointment:", error);
-    throw new Error("An error occurred while deleting the appointment");
-  }
-},
+        // Note: Since only admins can delete appointments, and we're returning the deleted appointment,
+        // there's no need to update the User document to pull the deleted appointment reference.
+        // This logic can be omitted or adjusted based on specific requirements of how you're tracking appointments.
+      } catch (error) {
+        // Log the error or handle it as needed
+        console.error("Error deleting appointment:", error);
+        throw new Error("An error occurred while deleting the appointment");
+      }
+    },
 
 
     //Deletes a message, authentication check is required so that only barbers can delete the message
@@ -258,26 +258,45 @@ const resolvers = {
     },
 
     //update the signed in user's appointment detail
-updateAppointment: async (_, { id, barber_name, date, time, service }, context) => {
-  if (!context.user) {
-    throw new Error("You need to be logged in to update this appointment!");
-  }
-  const user = await User.findById(context.user._id);
-  if (!user) {
-    throw new Error("User not found");
-  }
-  const appointment = user.appointments.id(id);
-  if (!appointment) {
-    throw new Error("Appointment not found");
-  }
-  // Update the appointment fields
-  appointment.barber_name = barber_name;
-  appointment.date = date;
-  appointment.time = time;
-  appointment.service = service; // Treated as a string, no enum concerns
-  await user.save();
-  return appointment;
-},
+    updateAppointment: async (_, { id, barber_name, date, time, service }, context) => {
+      // Check if the user is logged in
+      if (!context.user) {
+        throw new Error("You need to be logged in to update this appointment!");
+      }
+
+      // Find the user based on the context's user ID
+      const user = await User.findById(context.user._id);
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      // Add an admin check here
+      if (user.role !== 'admin') {
+        throw new Error("You must be an admin to update appointments.");
+      }
+
+      // Assuming appointments are directly related to the user model,
+      // this finds the specific appointment to update
+      const appointment = user.appointments.id(id);
+      if (!appointment) {
+        throw new Error("Appointment not found");
+      }
+
+      // Check if the provided barber_name matches one of the BarberEnum values
+      if (!Object.values(BarberEnum).includes(barber_name)) {
+        throw new Error("Invalid barber name");
+      }
+
+      // Update the appointment details
+      appointment.barber_name = barber_name;
+      appointment.date = date;
+      appointment.time = time;
+      appointment.service = service;
+      await user.save();
+
+      return appointment;
+    },
+
   },
 };
 
