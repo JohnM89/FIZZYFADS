@@ -88,7 +88,7 @@ const AppointmentsList = () => {
                             >
                                 Modify
                             </button>
-                            {selectedAppointmentId && (
+                            {selectedAppointmentId  === _id && (
                                 <ModifyAppointmentForm refetch={refetch}
                                     modifiedAppointment={sortedAppointments.find(appointment => appointment._id === selectedAppointmentId)}
                                     onClose={closeForm}
