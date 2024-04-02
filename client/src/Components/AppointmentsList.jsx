@@ -1,26 +1,25 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_ALL_APPOINTMENTS } from '../utils/queries';
-import { DELETE_APPOINTMENT, UPDATE_APPOINTMENT } from '../utils/mutations';
+import { DELETE_APPOINTMENT } from '../utils/mutations';
 import ModifyAppointmentForm from './ModifyAppointmentForm';
 
 const AppointmentsList = () => {
     const { loading, error, data } = useQuery(GET_ALL_APPOINTMENTS);
     const [orderBy, setOrderBy] = useState('date');
-    const [modifiedAppointments, setModifiedAppointments] = useState({});
+    // const [modifiedAppointments, setModifiedAppointments] = useState({});
+     const [selectedAppointmentId, setSelectedAppointmentId] = useState(null); 
     const [deleteAppointment, { loading: deleting, error: deleteError }] = useMutation(DELETE_APPOINTMENT, {
         refetchQueries: [{ query: GET_ALL_APPOINTMENTS }],
     });
-    const [updateAppointment] = useMutation(UPDATE_APPOINTMENT, {
-        refetchQueries: [{ query: GET_ALL_APPOINTMENTS }],
-    });
+    // const [updateAppointment] = useMutation(UPDATE_APPOINTMENT, {
+    //     refetchQueries: [{ query: GET_ALL_APPOINTMENTS }],
+    // });
 
-    const handleModify = (id, barber_name, date, time, service, user) => {
-        setModifiedAppointments(prevState => ({
-            ...prevState,
-            [id]: { id, barber_name, date, time, service, user }
-        }));
+    const handleModify = (id) => {
+        setSelectedAppointmentId(id);
     };
+
 
     const handleDelete = async (id) => {
         try {
@@ -30,37 +29,12 @@ const AppointmentsList = () => {
         }
     };
 
-const handleSubmit = async ({ appointmentId, barberName, date, time, service }) => {
-    try {
-        await updateAppointment({
-            variables: {
-                id: appointmentId, 
-                input: {
-                    barber_name: barberName, 
-                    date,
-                    time,
-                    service,
-                },
-            },
-        });
-        console.log('Appointment updated successfully');
-    } catch (error) {
-        console.error('Error updating appointment:', error);
-
-    }
-};
+    const closeForm = () => {
+        setSelectedAppointmentId(null); 
+    };
 
 
-const handleCancel = (id) => {
-    setModifiedAppointments(prevState => {
-        // Create a copy of the state to manipulate
-        const newState = { ...prevState };
-        // Remove the entry for the given id
-        delete newState[id];
-        // Return the new state without the entry
-        return newState;
-    });
-};
+
 
     const handleOrderByChange = (event) => {
         setOrderBy(event.target.value);
@@ -116,12 +90,10 @@ const handleCancel = (id) => {
                             >
                                 Modify
                             </button>
-                            {modifiedAppointments[_id] && (
+                            {selectedAppointmentId && (
                             <ModifyAppointmentForm
-                                modifiedAppointment={modifiedAppointments[_id]}
-                                handleSubmit={handleSubmit}
-                                handleCancel={handleCancel}
-                                appointmentId={_id} 
+                                modifiedAppointment={sortedAppointments.find(appointment => appointment._id === selectedAppointmentId)}
+                    onClose={closeForm}
                             />
                             )}
                         </div>

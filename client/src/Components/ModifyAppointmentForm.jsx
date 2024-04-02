@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import Calendar from 'react-calendar';
 import PropTypes from 'prop-types';
+import { useMutation } from '@apollo/client';
+import { UPDATE_APPOINTMENT } from '../utils/mutations';
 
-const ModifyAppointmentForm = ({ modifiedAppointment, handleSubmit, handleCancel }) => {
-    const [barberName, setBarberName] = useState(modifiedAppointment.barber_name || '');
-    const [date, setDate] = useState(modifiedAppointment.date || '');
-    const [time, setTime] = useState(modifiedAppointment.time || '');
-    const [service, setService] = useState(modifiedAppointment.service || '');
+const ModifyAppointmentForm = ({ modifiedAppointment, onClose }) => {
+    const [updateAppointment] = useMutation(UPDATE_APPOINTMENT);
+    const [barberName, setBarberName] = useState(modifiedAppointment.barber_name);
+    const [date, setDate] = useState(new Date(modifiedAppointment.date));
+    const [time, setTime] = useState(modifiedAppointment.time);
+    const [service, setService] = useState(modifiedAppointment.service);
     const [step, setStep] = useState(1);
 
     const handleNextStep = () => {
@@ -14,17 +17,24 @@ const ModifyAppointmentForm = ({ modifiedAppointment, handleSubmit, handleCancel
         setStep(step + 1);
     };
 
-const submitAndClose = () => {
-    console.log("Submitting and closing...");
-    handleSubmit({
-        appointmentId: modifiedAppointment.id,
-        barberName: barberName, // corrected to match handleSubmit
-        date,
-        time,
-        service,
-    });
-    handleCancel();
+const handleSubmit = async () => {
+    try {
+        await updateAppointment({
+            variables: {
+                id: modifiedAppointment.id,
+                barberName,
+                date,
+                time,
+                service,
+            },
+        });
+        console.log('Appointment updated successfully');
+        onClose(); 
+    } catch (error) {
+        console.error('Error updating appointment:', error.message);
+    }
 };
+
 
     console.log("Rendering ModifyAppointmentForm");
 
@@ -72,14 +82,14 @@ const submitAndClose = () => {
             {step <= 3 && (
                 <div className="mt-4 flex justify-between">
                     <button className="btn" onClick={handleNextStep}>Next</button>
-                    <button className="btn" onClick={() => handleCancel(modifiedAppointment.id)}>Cancel</button>
+                    <button onClick={onClose}>Cancel</button>
                 </div>
             )}
 
             {step === 4 && (
                 <div className="mt-4 flex justify-between">
-                    <button className="btn" onClick={submitAndClose}>Submit</button>
-                    <button className="btn" onClick={() => handleCancel(modifiedAppointment.id)}>Cancel</button>
+                    <button onClick={handleSubmit}>Submit</button>
+                    <button onClick={onClose}>Cancel</button>
                 </div>
             )}
         </div>
@@ -89,8 +99,7 @@ const submitAndClose = () => {
 // props validation
 ModifyAppointmentForm.propTypes = {
     modifiedAppointment: PropTypes.object.isRequired,
-    handleSubmit: PropTypes.func.isRequired,
-    handleCancel: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
 };
 
 export default ModifyAppointmentForm;

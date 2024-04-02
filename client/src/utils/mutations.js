@@ -95,7 +95,21 @@ mutation UpdateAppointment($id: ID!, $barberName: BarberEnum!, $date: String!, $
     service
   }
 }
-`;
+`
+
+// export const UPDATE_APPOINTMENT = gql`
+//   mutation UpdateAppointment($id: ID!, $input: UpdateAppointmentInput!) {
+//     updateAppointment(id: $id, input: $input) {
+//       _id
+//       barber_name
+//       date
+//       time
+//       service
+//     }
+//   }
+// `;
+
+
 
 
 
